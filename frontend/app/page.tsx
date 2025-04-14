@@ -79,7 +79,7 @@ export default function Home() {
       {/* <img src="/images/pelota.webp" alt="imagen de pleota" className="w-full h-screen absolute z-2"/> */}
       <Card className="z-10">
         <CardHeader className="text-center">
-          <CardTitle>Vollleyball Scorer</CardTitle>
+          <CardTitle>Volleyball Scorer</CardTitle>
           <CardDescription>
             Ingresa los nombres de los equipops para comenzar
           </CardDescription>
