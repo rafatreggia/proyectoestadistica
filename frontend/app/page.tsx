@@ -108,6 +108,7 @@ export default function Home() {
         </CardContent>
         <CardFooter className="flex items-center justify-center">
           <Button
+          variant="personalizado"
             className="w-full"
             onClick={() => {
               handleClick();

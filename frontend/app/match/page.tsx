@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { Loader2, Volleyball } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { VolleyballRadio } from "@/components/volleyballRadio";
 
 type PointType =
   | "attack"
@@ -41,7 +42,7 @@ interface TeamData {
   name: string;
   sets: number;
   points: PointLog[];
-  pointsByType: Record<PointType, number>;
+  pointsByType: any;
 }
 
 interface MatchData {
@@ -96,9 +97,68 @@ const Page = () => {
 
   console.log(matchData);
   console.log(currentSet);
+
   const sumarPunto = (team: 1 | 2) => {
     console.log(team);
+    console.log(pointType);
+
+    //ver si existe matchData sino hacer un return para que no se rompa todo
+    if (!matchData) {
+      return;
+    }
+    //hacer una copia de cual es la data del partido y hacer una copia de la data del set actual
+    let newMatchData = { ...matchData };
+    console.log(newMatchData);
+    let currentSetData = { ...currentSet };
+    console.log(currentSetData);
+    //determinar cual fue el equipo q hizo el punto
+    let scoringTeam: "team1" | "team2" = team === 1 ? "team1" : "team2";
+    let otherTeam = team === 1 ? "team2" : "team1";
+
+    //al set actual sumarle 1 al que gana el set
+    if (scoringTeam === "team1") {
+      currentSetData.team1Points = currentSetData.team1Points + 1;
+    } else {
+      currentSetData.team2Points += 1;
+    }
+    console.log(currentSetData);
+    //crear el pointLog y agregar ese pointLog
+    let nameTeamPoint =
+      scoringTeam === "team1"
+        ? newMatchData.team1.name
+        : newMatchData.team2.name;
+    console.log(nameTeamPoint);
+    let pointLog: PointLog = {
+      team: nameTeamPoint,
+      type: pointType,
+      setNumber: newMatchData.currentSet,
+      score: {
+        team1: currentSetData.team1Points,
+        team2: currentSetData.team2Points,
+      },
+    };
+    currentSetData.pointsLog.push(pointLog);
+    console.log(pointLog);
+    console.log(currentSetData);
+    //actualizar la informacion del set
+    newMatchData.sets[newMatchData.currentSet - 1] = currentSetData;
+    //actualizar las estadisticas para agregarle a cada equipo un punto mas
+    newMatchData[scoringTeam].points.push(pointLog);
+    newMatchData[scoringTeam].pointsByType[pointType] += 1;
+    //check si termino o no el set y si termino o no el partido
+    let team1Points = currentSetData.team1Points;
+    let team2Points = currentSetData.team2Points;
+    let isSetFinished = false;
+    if (team1Points >= 25 && team1Points - team2Points >= 2) {
+      isSetFinished = true;
+    }
+    if (team2Points >= 25 && team2Points - team1Points >= 2) {
+      isSetFinished = true;
+    }
+
+    //metodo para guardat los datos tanto en el useState como en el localStorage
   };
+
   return (
     <div className="w-full min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-blue-100 py-8">
       <div className="container mx-auto max-w-4xl px-4">
@@ -168,64 +228,36 @@ const Page = () => {
                 }}
               >
                 <div className="flex items-center space-x-2 bg-white px-3 py-2 rounded-lg border border-blue-200 shadow-sm">
-                  
-                  <RadioGroupItem
-                    value="serve"
+                  <VolleyballRadio
                     id="serve"
-                    className="text-blue-600"
+                    value="serve"
+                    label="Saque"
+                    isSelected={"serve" === pointType}
                   />
-                  <Label htmlFor="serve" className="font-medium cursor-pointer">
-                    Saque
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2 bg-white px-3 py-2 rounded-lg border border-blue-200 shadow-sm">
-                  <RadioGroupItem
-                    value="attack"
+                  <VolleyballRadio
                     id="attack"
-                    className="text-blue-600"
+                    value="attack"
+                    label="Ataque"
+                    isSelected={"attack" === pointType}
                   />
-                  <Label
-                    htmlFor="attack"
-                    className="font-medium cursor-pointer"
-                  >
-                    Ataque
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2 bg-white px-3 py-2 rounded-lg border border-blue-200 shadow-sm">
-                  <RadioGroupItem
-                    value="counterAttack"
+                  <VolleyballRadio
                     id="counterAttack"
-                    className="text-blue-600"
+                    value="counterAttack"
+                    label="Contra Ataque"
+                    isSelected={"counterAttack" === pointType}
                   />
-                  <Label
-                    htmlFor="counterAttack"
-                    className="font-medium cursor-pointer"
-                  >
-                    Contra Ataque
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2 bg-white px-3 py-2 rounded-lg border border-blue-200 shadow-sm">
-                  <RadioGroupItem
-                    value="block"
+                  <VolleyballRadio
                     id="block"
-                    className="text-blue-600"
+                    value="block"
+                    label="Bloqueo"
+                    isSelected={"block" === pointType}
                   />
-                  <Label htmlFor="block" className="font-medium cursor-pointer">
-                    Bloqueo
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2 bg-white px-3 py-2 rounded-lg border border-blue-200 shadow-sm">
-                  <RadioGroupItem
-                    value="unForcedError"
+                  <VolleyballRadio
                     id="unForcedError"
-                    className="text-blue-600"
+                    value="unForcedError"
+                    label="Error NF"
+                    isSelected={"unForcedError" === pointType}
                   />
-                  <Label
-                    htmlFor="unForcedError"
-                    className="font-medium cursor-pointer"
-                  >
-                    Error NF
-                  </Label>
                 </div>
               </RadioGroup>
             </CardContent>
@@ -252,7 +284,6 @@ const Page = () => {
           </Card>
         </div>
 
-        {/* Points History Card */}
         <Card className="border-2 border-blue-200 shadow-lg mb-6 overflow-hidden">
           <CardHeader className="bg-blue-600 text-white pb-3">
             <CardTitle className="text-[28px] font-bold">
@@ -296,111 +327,6 @@ const Page = () => {
         </div>
       </div>
     </div>
-
-    // <div className="w-full h-screen flex items-center justify-center bg-gray-50">
-    //   <div className="container mx-auto max-w-4xl">
-    //     <h1 className="text-center text-[36px] font-bold capitalize">
-    //       {matchData.team1.name} vs {matchData.team2.name}
-    //     </h1>
-    //     <div className="grid grid-cols-1  lg:grid-cols-2 gap-5 mt-5 mb-5">
-    //       <Card>
-    //         <CardHeader>
-    //           <CardTitle className="text-center text-[28px]">
-    //             Marcador
-    //           </CardTitle>
-    //         </CardHeader>
-    //         <CardContent className="flex items-center justify-center">
-    //           <div className="flex justify-between items-center gap-20">
-    //             <div className="text-center">
-    //               <h3 className="font-medium">{matchData.team1.name}</h3>
-    //               <div className="text-[40px] font-bold">
-    //                 {currentSet.team1Points}
-    //               </div>
-    //               <div className="text-xl mt-2">{matchData.team1.sets}</div>
-    //             </div>
-    //             <div className="text-xl font-bold">-</div>
-    //             <div className="text-center">
-    //               <h3 className="font-medium">{matchData.team2.name}</h3>
-    //               <div className="text-[40px] font-bold">
-    //                 {currentSet.team2Points}
-    //               </div>
-    //               <div className="text-xl mt-2">{matchData.team2.sets}</div>
-    //             </div>
-    //           </div>
-    //         </CardContent>
-    //         <CardFooter className="flex items-center justify-center">
-    //           <span className="font-semibold rounded-3xl border-[1px] border-gray-300 px-2 py-[1px] bg-gray-100">
-    //             Set {matchData.currentSet}
-    //           </span>
-    //         </CardFooter>
-    //       </Card>
-    //       <Card>
-    //         <CardHeader>
-    //           <CardTitle className="text-center text-[28px]">
-    //             Anotar Punto
-    //           </CardTitle>
-    //         </CardHeader>
-    //         <CardContent>
-    //           <RadioGroup
-    //             value={pointType}
-    //             className="flex gap-5 items-center justify-center flex-wrap"
-    //             onValueChange={(e: any) => {
-    //               setPointType(e);
-    //               console.log(e);
-    //             }}
-    //           >
-    //             <div className="flex items-center space-x-2">
-    //               <RadioGroupItem value="serve" id="serve" />
-    //               <Label htmlFor="serve">Saque</Label>
-    //             </div>
-    //             <div className="flex items-center space-x-2">
-    //               <RadioGroupItem value="attack" id="attack" />
-    //               <Label htmlFor="attack">Ataque</Label>
-    //             </div>
-    //             <div className="flex items-center space-x-2">
-    //               <RadioGroupItem value="counterAttack" id="counterAttack" />
-    //               <Label htmlFor="counterAttack">Contra Ataque</Label>
-    //             </div>
-    //             <div className="flex items-center space-x-2">
-    //               <RadioGroupItem value="block" id="block" />
-    //               <Label htmlFor="block">Bloqueo</Label>
-    //             </div>
-    //             <div className="flex items-center space-x-2">
-    //               <RadioGroupItem value="unForcedError" id="unForcedError" />
-    //               <Label htmlFor="unForcedError">Error NF</Label>
-    //             </div>
-    //           </RadioGroup>
-    //         </CardContent>
-    //         <CardFooter>
-    //           <div className="w-full flex items-center justify-around">
-
-    //             <Button onClick={()=>{sumarPunto(1)}}>Punto Para {matchData.team1.name}</Button>
-    //             <Button onClick={()=>{sumarPunto(2)}}>Punto Para {matchData.team2.name}</Button>
-    //           </div>
-    //         </CardFooter>
-    //       </Card>
-    //     </div>
-
-    //     <Card>
-    //       <CardHeader>
-    //         <CardTitle className=" text-[28px]">
-    //           Historial de Puntos (Set Actual)
-    //         </CardTitle>
-    //         <CardDescription>Card Description</CardDescription>
-    //       </CardHeader>
-    //       <CardContent>
-    //         <p>Card Content</p>
-    //       </CardContent>
-    //       <CardFooter>
-    //         <p>Card Footer</p>
-    //       </CardFooter>
-    //     </Card>
-    //     <div className="flex items-center justify-between mt-5">
-    //       <Button variant="ghost">Terminar Partido</Button>
-    //       <Button variant="destructive">Reiniciar Partido</Button>
-    //     </div>
-    //   </div>
-    // </div>
   );
 };
 
