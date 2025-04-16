@@ -78,11 +78,13 @@ export default function Home() {
     <div className="w-full h-screen bg-gray-50 p-10 flex flex-col items-center justify-center relative">
       {/* <img src="/images/pelota.webp" alt="imagen de pleota" className="w-full h-screen absolute z-2"/> */}
       <Card className="z-10">
-        <CardHeader className="text-center">
-          <CardTitle>Volleyball Scorer</CardTitle>
-          <CardDescription>
-            Ingresa los nombres de los equipops para comenzar
-          </CardDescription>
+        <CardHeader className="text-center bg-blue-600 rounded-t-xl">
+          <div>
+            <CardTitle className="text-white">Volleyball Scorer</CardTitle>
+            <CardDescription className="text-gray-300">
+              Ingresa los nombres de los equipops para comenzar
+            </CardDescription>
+          </div>
         </CardHeader>
         <CardContent className="space-y-5">
           <div>
@@ -108,7 +110,7 @@ export default function Home() {
         </CardContent>
         <CardFooter className="flex items-center justify-center">
           <Button
-          variant="personalizado"
+            variant="personalizado"
             className="w-full"
             onClick={() => {
               handleClick();

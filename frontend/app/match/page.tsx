@@ -219,50 +219,52 @@ const Page = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-4">
-              <RadioGroup
-                value={pointType}
-                className="flex gap-4 items-center justify-center flex-wrap"
-                onValueChange={(e: any) => {
-                  setPointType(e);
-                  console.log(e);
-                }}
-              >
-                <div className="flex items-center space-x-2 bg-white px-3 py-2 rounded-lg border border-blue-200 shadow-sm">
-                  <VolleyballRadio
-                    id="serve"
-                    value="serve"
-                    label="Saque"
-                    isSelected={"serve" === pointType}
-                  />
-                  <VolleyballRadio
-                    id="attack"
-                    value="attack"
-                    label="Ataque"
-                    isSelected={"attack" === pointType}
-                  />
-                  <VolleyballRadio
-                    id="counterAttack"
-                    value="counterAttack"
-                    label="Contra Ataque"
-                    isSelected={"counterAttack" === pointType}
-                  />
-                  <VolleyballRadio
-                    id="block"
-                    value="block"
-                    label="Bloqueo"
-                    isSelected={"block" === pointType}
-                  />
-                  <VolleyballRadio
-                    id="unForcedError"
-                    value="unForcedError"
-                    label="Error NF"
-                    isSelected={"unForcedError" === pointType}
-                  />
-                </div>
-              </RadioGroup>
+              <div className="pt-4 flex flex-wrap items-center justify-center">
+                <RadioGroup
+                  value={pointType}
+                  className="flex gap-4 items-center justify-center flex-wrap"
+                  onValueChange={(e: any) => {
+                    setPointType(e);
+                    console.log(e);
+                  }}
+                >
+                  <div className="flex items-center flex-wrap gap-2 bg-white px-3 py-2 rounded-lg border border-blue-200 shadow-sm justify-center">
+                    <VolleyballRadio
+                      id="serve"
+                      value="serve"
+                      label="Saque"
+                      isSelected={"serve" === pointType}
+                    />
+                    <VolleyballRadio
+                      id="attack"
+                      value="attack"
+                      label="Ataque"
+                      isSelected={"attack" === pointType}
+                    />
+                    <VolleyballRadio
+                      id="counterAttack"
+                      value="counterAttack"
+                      label="Contra Ataque"
+                      isSelected={"counterAttack" === pointType}
+                    />
+                    <VolleyballRadio
+                      id="block"
+                      value="block"
+                      label="Bloqueo"
+                      isSelected={"block" === pointType}
+                    />
+                    <VolleyballRadio
+                      id="unForcedError"
+                      value="unForcedError"
+                      label="Error NF"
+                      isSelected={"unForcedError" === pointType}
+                    />
+                  </div>
+                </RadioGroup>
+              </div>
             </CardContent>
             <CardFooter className="bg-blue-50 pt-4">
-              <div className="w-full flex items-center justify-around gap-4">
+              <div className="w-full flex  justify-around gap-4">
                 <Button
                   onClick={() => {
                     sumarPunto(1);
