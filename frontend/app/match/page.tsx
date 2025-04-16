@@ -313,7 +313,7 @@ const Page = () => {
                     <VolleyballRadio
                       id="counterAttack"
                       value="counterAttack"
-                      label="Contra Ataque"
+                      label="Contra Ataq"
                       isSelected={"counterAttack" === pointType}
                     />
                     <VolleyballRadio
@@ -343,7 +343,7 @@ const Page = () => {
                     <VolleyballRadio
                       id="errorServe"
                       value="errorServe"
-                      label="Error Saque"
+                      label="Error Saq"
                       isSelected={"errorServe" === pointType}
                     />
                   </div>
