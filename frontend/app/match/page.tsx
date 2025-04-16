@@ -92,6 +92,21 @@ const Page = () => {
       </h1>
     );
   }
+  if (matchData.matchFinished === true) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative w-16 h-16">
+            <div className="absolute inset-0 border-4 border-blue-500 rounded-full border-t-transparent animate-spin"></div>
+            <div className="absolute inset-2 border-4 border-yellow-400 rounded-full border-b-transparent animate-spin animation-delay-150"></div>
+          </div>
+          <span className="text-xl font-semibold text-blue-700">
+            Partido Terminado: Redirigiendo...
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   const currentSet = matchData.sets[matchData.currentSet - 1];
 
@@ -155,8 +170,35 @@ const Page = () => {
     if (team2Points >= 25 && team2Points - team1Points >= 2) {
       isSetFinished = true;
     }
-
+    if (isSetFinished === true) {
+      if (team1Points > team2Points) {
+        newMatchData.team1.sets += 1;
+      } else {
+        newMatchData.team2.sets += 1;
+      }
+      if (newMatchData.team1.sets === 3 || newMatchData.team2.sets === 3) {
+        newMatchData.matchFinished = true;
+        actualizarDatos(newMatchData);
+        router.push("/resultados");
+        return;
+      } else {
+        newMatchData.currentSet += 1;
+        newMatchData.sets.push({
+          team1Points: 0,
+          team2Points: 0,
+          pointsLog: [],
+        });
+        actualizarDatos(newMatchData);
+      }
+    } else {
+      actualizarDatos(newMatchData);
+    }
+    console.log(matchData);
     //metodo para guardat los datos tanto en el useState como en el localStorage
+  };
+  let actualizarDatos = (nuevosDatos: MatchData) => {
+    setMatchData(nuevosDatos);
+    localStorage.setItem("volleyballMatch", JSON.stringify(nuevosDatos));
   };
 
   return (
@@ -264,7 +306,7 @@ const Page = () => {
               </div>
             </CardContent>
             <CardFooter className="bg-blue-50 pt-4">
-              <div className="w-full flex  justify-around gap-4">
+              <div className="w-full flex flex-wrap justify-around gap-4 ">
                 <Button
                   onClick={() => {
                     sumarPunto(1);
