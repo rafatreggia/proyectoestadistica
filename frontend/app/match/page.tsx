@@ -20,7 +20,10 @@ type PointType =
   | "serve"
   | "block"
   | "unForcedError"
-  | "counterAttack";
+  | "counterAttack"
+  | "errorCounterAttack"
+  | "errorAttack"
+  | "errorServe";
 
 interface PointLog {
   team: string;
@@ -201,6 +204,30 @@ const Page = () => {
     localStorage.setItem("volleyballMatch", JSON.stringify(nuevosDatos));
   };
 
+
+  const traducirPunto = (tipo:PointType)=>{
+    switch(tipo){
+      case "attack":
+        return "ataque"
+      case "serve":
+        return "saque"
+      case "block":
+        return "bloqueo"
+      case "unForcedError":
+        return "error no forzado"
+      case "counterAttack":
+        return "contra ataque"
+        case "errorAttack":
+        return "error de ataque"
+      case "errorServe":
+        return "error de saque"
+      case "errorCounterAttack":
+        return "error de contra ataque"
+      default:
+        return "Tipo de Punto no Definido"
+    }
+  }
+
   return (
     <div className="w-full min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-blue-100 py-8">
       <div className="container mx-auto max-w-4xl px-4">
@@ -301,6 +328,24 @@ const Page = () => {
                       label="Error NF"
                       isSelected={"unForcedError" === pointType}
                     />
+                    <VolleyballRadio
+                      id="errorCounterAttack"
+                      value="errorCounterAttack"
+                      label="Error CA"
+                      isSelected={"errorCounterAttack" === pointType}
+                    />
+                    <VolleyballRadio
+                      id="errorAttack"
+                      value="errorAttack"
+                      label="Error A"
+                      isSelected={"errorAttack" === pointType}
+                    />
+                    <VolleyballRadio
+                      id="errorServe"
+                      value="errorServe"
+                      label="Error Saque"
+                      isSelected={"errorServe" === pointType}
+                    />
                   </div>
                 </RadioGroup>
               </div>
@@ -338,12 +383,28 @@ const Page = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="bg-white p-4">
-            <div className="min-h-[100px] bg-blue-50 rounded-lg p-4 border border-blue-200">
-              <p className="text-blue-700 italic text-center">
-                No hay puntos registrados en este set
-              </p>
-              {/* Your point history would go here */}
-            </div>
+            {currentSet?.pointsLog?.length > 0 ? (
+              <div className="text-blue-700 text-center space-y-5 w-full">
+                {currentSet.pointsLog.map((pointLog, index) => {
+                  return (
+                    <div className="flex justify-between w-full capitalize">
+                      <span>{pointLog.team}</span>
+                      <span>{traducirPunto(pointLog.type)}</span>
+                      <span>
+                        {pointLog.score.team1}-{pointLog.score.team2}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="min-h-[100px] bg-blue-50 rounded-lg p-4 border border-blue-200">
+                <p className="text-blue-700 italic text-center">
+                  No hay puntos registrados en este set
+                </p>
+                {/* Your point history would go here */}
+              </div>
+            )}
           </CardContent>
           <CardFooter className="bg-blue-50 py-3">
             <div className="w-full flex justify-end">
