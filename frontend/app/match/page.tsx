@@ -387,7 +387,7 @@ const Page = () => {
               <div className="text-blue-700 text-center space-y-5 w-full">
                 {currentSet.pointsLog.map((pointLog, index) => {
                   return (
-                    <div className="flex justify-between w-full capitalize">
+                    <div key={index} className="flex justify-between w-full capitalize">
                       <span>{pointLog.team}</span>
                       <span>{traducirPunto(pointLog.type)}</span>
                       <span>
