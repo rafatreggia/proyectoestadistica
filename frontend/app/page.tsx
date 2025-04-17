@@ -87,8 +87,8 @@ export default function Home() {
           </div>
         </CardHeader>
         <CardContent className="space-y-5">
-          <div>
-            <Label>Equipo 1</Label>
+          <div className="pt-5">
+            <Label >Equipo 1</Label>
             <Input
               placeholder="Nombre delEquipo 1"
               value={team1}
