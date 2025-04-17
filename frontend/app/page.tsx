@@ -44,24 +44,46 @@ export default function Home() {
         name: team1,
         sets: 0,
         points: [],
+        errors: {
+          unForcedError: 0,
+          errorCounterAttack: 0,
+          errorAttack: 0,
+          errorServe: 0,
+          totalErrors: 0,
+        },
         pointsByType: {
           attack: 0,
           serve: 0,
           block: 0,
           forcedError: 0,
           unforced: 0,
+          unForcedError: 0,
+          errorCounterAttack: 0,
+          errorAttack: 0,
+          errorServe: 0,
         },
       },
       team2: {
         name: team2,
         sets: 0,
         points: [],
+        errors: {
+          unForcedError: 0,
+          errorCounterAttack: 0,
+          errorAttack: 0,
+          errorServe: 0,
+          totalErrors: 0,
+        },
         pointsByType: {
           attack: 0,
           serve: 0,
           block: 0,
           forcedError: 0,
           unforced: 0,
+          unForcedError: 0,
+          errorCounterAttack: 0,
+          errorAttack: 0,
+          errorServe: 0,
         },
       },
       currentSet: 1,
@@ -88,7 +110,7 @@ export default function Home() {
         </CardHeader>
         <CardContent className="space-y-5">
           <div className="pt-5">
-            <Label >Equipo 1</Label>
+            <Label>Equipo 1</Label>
             <Input
               placeholder="Nombre delEquipo 1"
               value={team1}

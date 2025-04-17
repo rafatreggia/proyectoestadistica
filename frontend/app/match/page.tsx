@@ -41,10 +41,19 @@ interface SetData {
   pointsLog: PointLog[];
 }
 
+interface Errors {
+  unForcedError: number;
+  errorCounterAttack: number;
+  errorAttack: number;
+  errorServe: number;
+  totalErrors: number;
+}
+
 interface TeamData {
   name: string;
   sets: number;
   points: PointLog[];
+  errors: Errors;
   pointsByType: any;
 }
 
@@ -131,7 +140,7 @@ const Page = () => {
     console.log(currentSetData);
     //determinar cual fue el equipo q hizo el punto
     let scoringTeam: "team1" | "team2" = team === 1 ? "team1" : "team2";
-    let otherTeam = team === 1 ? "team2" : "team1";
+    let otherTeam: "team1" | "team2" = team === 1 ? "team2" : "team1";
 
     //al set actual sumarle 1 al que gana el set
     if (scoringTeam === "team1") {
@@ -163,6 +172,16 @@ const Page = () => {
     //actualizar las estadisticas para agregarle a cada equipo un punto mas
     newMatchData[scoringTeam].points.push(pointLog);
     newMatchData[scoringTeam].pointsByType[pointType] += 1;
+    //agregar error si el punto fue error
+    if (
+      pointType === "unForcedError" ||
+      pointType === "errorServe" ||
+      pointType === "errorAttack" ||
+      pointType === "errorCounterAttack"
+    ) {
+      newMatchData[otherTeam].errors.totalErrors += 1;
+      newMatchData[otherTeam].errors[pointType] += 1;
+    }
     //check si termino o no el set y si termino o no el partido
     let team1Points = currentSetData.team1Points;
     let team2Points = currentSetData.team2Points;
@@ -204,29 +223,28 @@ const Page = () => {
     localStorage.setItem("volleyballMatch", JSON.stringify(nuevosDatos));
   };
 
-
-  const traducirPunto = (tipo:PointType)=>{
-    switch(tipo){
+  const traducirPunto = (tipo: PointType) => {
+    switch (tipo) {
       case "attack":
-        return "ataque"
+        return "ataque";
       case "serve":
-        return "saque"
+        return "saque";
       case "block":
-        return "bloqueo"
+        return "bloqueo";
       case "unForcedError":
-        return "error no forzado"
+        return "error no forzado";
       case "counterAttack":
-        return "contra ataque"
-        case "errorAttack":
-        return "error de ataque"
+        return "contra ataque";
+      case "errorAttack":
+        return "error de ataque";
       case "errorServe":
-        return "error de saque"
+        return "error de saque";
       case "errorCounterAttack":
-        return "error de contra ataque"
+        return "error de contra ataque";
       default:
-        return "Tipo de Punto no Definido"
+        return "Tipo de Punto no Definido";
     }
-  }
+  };
 
   return (
     <div className="w-full min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-blue-100 py-8">
@@ -387,7 +405,10 @@ const Page = () => {
               <div className="text-blue-700 text-center space-y-5 w-full">
                 {currentSet.pointsLog.map((pointLog, index) => {
                   return (
-                    <div key={index} className="flex justify-between w-full capitalize">
+                    <div
+                      key={index}
+                      className="flex justify-between w-full capitalize"
+                    >
                       <span>{pointLog.team}</span>
                       <span>{traducirPunto(pointLog.type)}</span>
                       <span>
