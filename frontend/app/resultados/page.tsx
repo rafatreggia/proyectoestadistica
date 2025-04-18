@@ -166,15 +166,47 @@ const Page = () => {
           <TabsContent value="resumen">
             <Card>
               <CardHeader>
-                <CardTitle>Resumen Por Sets</CardTitle>
-                <CardDescription>{matchData.team1.name} vs {matchData.team2.name}</CardDescription>
+                <CardTitle className="text-[25px] text-blue-700">
+                  Resumen Por Sets
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <p>Card Content</p>
+                <div className="space-y-7">
+                  {matchData.sets.map((set, index) => {
+                    return (
+                      <div className="space-y-3 border-b-2 pb-2 border-blue-500">
+                        <h1 className="text-[15px]">Set {index + 1}</h1>
+                        <div className="flex items-center justify-between capitalize text-[20px]">
+                          <div>
+                            <h2>{matchData.team1.name}</h2>
+                            <h3 className=" flex gap-2 font-semibold text-[30px] py-2">
+                              {set.team1Points}
+                              {set.team1Points > set.team2Points && (
+                                <img
+                                  src="/images/pelota.webp"
+                                  className="w-[45px]"
+                                ></img>
+                              )}
+                            </h3>
+                          </div>
+                          <div className="flex flex-col justify-end items-end">
+                            <h2>{matchData.team2.name}</h2>
+                            <h3 className=" flex flex-row-reverse gap-2 font-semibold text-[30px] py-2">
+                              {set.team2Points}
+                              {set.team2Points > set.team1Points && (
+                                <img
+                                  src="/images/pelota.webp"
+                                  className="w-[45px]"
+                                ></img>
+                              )}
+                            </h3>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </CardContent>
-              <CardFooter>
-                <p>Card Footer</p>
-              </CardFooter>
             </Card>
           </TabsContent>
           <TabsContent value="team1">team1 </TabsContent>
