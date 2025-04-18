@@ -164,7 +164,18 @@ const Page = () => {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="resumen">
-            resumnen
+            <Card>
+              <CardHeader>
+                <CardTitle>Resumen Por Sets</CardTitle>
+                <CardDescription>{matchData.team1.name} vs {matchData.team2.name}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p>Card Content</p>
+              </CardContent>
+              <CardFooter>
+                <p>Card Footer</p>
+              </CardFooter>
+            </Card>
           </TabsContent>
           <TabsContent value="team1">team1 </TabsContent>
           <TabsContent value="team2">team2</TabsContent>
