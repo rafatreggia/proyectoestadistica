@@ -192,6 +192,15 @@ const Page = () => {
     if (team2Points >= 25 && team2Points - team1Points >= 2) {
       isSetFinished = true;
     }
+    //yo ahora lo que tengo que hacer es si van 2 set a 2 set y estamos en el 5to set
+    if(newMatchData.currentSet === 5){
+      if (team1Points >= 15 && team1Points - team2Points >= 2) {
+        isSetFinished = true;
+      }
+      if (team2Points >= 15 && team2Points - team1Points >= 2) {
+        isSetFinished = true;
+      }
+    }
     if (isSetFinished === true) {
       if (team1Points > team2Points) {
         newMatchData.team1.sets += 1;
@@ -215,6 +224,7 @@ const Page = () => {
     } else {
       actualizarDatos(newMatchData);
     }
+   
     console.log(matchData);
     //metodo para guardat los datos tanto en el useState como en el localStorage
   };
