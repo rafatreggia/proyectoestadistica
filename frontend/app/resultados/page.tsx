@@ -8,7 +8,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 import { Volleyball } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
@@ -52,7 +58,7 @@ interface TeamData {
   sets: number;
   points: PointLog[];
   errors: Errors;
-  pointsByType: any;
+  pointsByType: Record<PointType, number>;
 }
 
 interface MatchData {
@@ -154,7 +160,7 @@ const Page = () => {
           </CardFooter>
         </Card>
         <Tabs defaultValue="resumen" className="w-full mt-10">
-          <TabsList className="w-full grid grid-cols-3">
+          <TabsList className="w-full grid lg:grid-cols-3 grid-cols-1 mb-[10px] pb-[90px] lg:mb-0 lg:pb-0">
             <TabsTrigger value="resumen">Resumen</TabsTrigger>
             <TabsTrigger value="team1" className="capitalize">
               Estadisticas: {matchData.team1.name}
@@ -171,10 +177,13 @@ const Page = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div  className="space-y-7">
+                <div className="space-y-7">
                   {matchData.sets.map((set, index) => {
                     return (
-                      <div key={index} className="space-y-3 border-b-2 pb-2 border-blue-500">
+                      <div
+                        key={index}
+                        className="space-y-3 border-b-2 pb-2 border-blue-500"
+                      >
                         <h1 className="text-[15px]">Set {index + 1}</h1>
                         <div className="flex items-center justify-between capitalize text-[20px]">
                           <div>
@@ -212,18 +221,39 @@ const Page = () => {
           <TabsContent value="team1">
             <Card>
               <CardHeader>
-                <CardTitle>Card Title</CardTitle>
-                <CardDescription>Card Description</CardDescription>
+                <CardTitle className="text-[35px] text-blue-700">
+                  Resumen{" "}
+                  <span className="capitalize ">{matchData.team1.name}</span>
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <p>Card Content</p>
+                <h1 className="text-[25px] font-semibold">
+                  Totales Ganados: {matchData.team1.points.length} puntos
+                </h1>
+                <GraficoPuntos teamData={matchData.team1} />
+
+                {/* pointLOg[]<= con length le estoy pidiendo a JS cuantos elementos tiene ese arreglo */}
               </CardContent>
-              <CardFooter>
-                <p>Card Footer</p>
-              </CardFooter>
             </Card>
           </TabsContent>
-          <TabsContent value="team2">team2</TabsContent>
+          <TabsContent value="team2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-[35px] text-blue-700">
+                  Resumen{" "}
+                  <span className="capitalize ">{matchData.team2.name}</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <h1 className="text-[25px] font-semibold">
+                  Totales Ganados: {matchData.team2.points.length} puntos
+                </h1>
+                <GraficoPuntos teamData={matchData.team2} />
+
+                {/* pointLOg[]<= con length le estoy pidiendo a JS cuantos elementos tiene ese arreglo */}
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </div>
     </div>
@@ -231,3 +261,45 @@ const Page = () => {
 };
 
 export default Page;
+
+const chartConfig = {
+  pointType: {
+    label: "Tipo de Punto",
+    color: "#0067b1",
+  },
+} satisfies ChartConfig;
+
+const GraficoPuntos = ({ teamData }: { teamData: TeamData }) => {
+  console.log(teamData);
+  const chartData = [
+    { type: "Saque", pointType: teamData.pointsByType.serve },
+    { type: "Ataque", pointType: teamData.pointsByType.attack },
+    { type: "Bloqueo", pointType: teamData.pointsByType.block },
+    { type: "Error NF", pointType: teamData.pointsByType.unForcedError },
+    { type: "Contra Ataque", pointType: teamData.pointsByType.counterAttack },
+    { type: "Error CA", pointType: teamData.pointsByType.errorCounterAttack },
+    { type: "Error Ataque", pointType: teamData.pointsByType.errorAttack },
+    { type: "Error Saque", pointType: teamData.pointsByType.errorServe },
+  ];
+  return (
+    <div>
+      <ChartContainer config={chartConfig}>
+        <BarChart accessibilityLayer data={chartData}>
+          <CartesianGrid vertical={false} />
+          <XAxis
+            dataKey="type"
+            tickLine={false}
+            tickMargin={10}
+            axisLine={false}
+            // tickFormatter={(value) => value.slice(0, 6)}
+          />
+          <ChartTooltip
+            cursor={false}
+            content={<ChartTooltipContent indicator="dashed" />}
+          />
+          <Bar dataKey="pointType" fill="var(--color-pointType)" radius={4} />
+        </BarChart>
+      </ChartContainer>
+    </div>
+  );
+};
