@@ -171,10 +171,10 @@ const Page = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-7">
+                <div  className="space-y-7">
                   {matchData.sets.map((set, index) => {
                     return (
-                      <div className="space-y-3 border-b-2 pb-2 border-blue-500">
+                      <div key={index} className="space-y-3 border-b-2 pb-2 border-blue-500">
                         <h1 className="text-[15px]">Set {index + 1}</h1>
                         <div className="flex items-center justify-between capitalize text-[20px]">
                           <div>
