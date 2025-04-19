@@ -12,6 +12,14 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { Loader2, Volleyball } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { VolleyballRadio } from "@/components/volleyballRadio";
 
@@ -69,6 +77,7 @@ const Page = () => {
   const [matchData, setMatchData] = useState<MatchData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [pointType, setPointType] = useState<PointType>("attack");
+  const [open, setOpen] = useState<boolean>(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -193,7 +202,7 @@ const Page = () => {
       isSetFinished = true;
     }
     //yo ahora lo que tengo que hacer es si van 2 set a 2 set y estamos en el 5to set
-    if(newMatchData.currentSet === 5){
+    if (newMatchData.currentSet === 5) {
       if (team1Points >= 15 && team1Points - team2Points >= 2) {
         isSetFinished = true;
       }
@@ -224,9 +233,65 @@ const Page = () => {
     } else {
       actualizarDatos(newMatchData);
     }
-   
+
     console.log(matchData);
     //metodo para guardat los datos tanto en el useState como en el localStorage
+  };
+
+  const reiniciarPartido = () => {
+    let datosInicialesDePartido = {
+      team1: {
+        name: matchData.team1.name,
+        sets: 0,
+        points: [],
+        errors: {
+          unForcedError: 0,
+          errorCounterAttack: 0,
+          errorAttack: 0,
+          errorServe: 0,
+          totalErrors: 0,
+        },
+        pointsByType: {
+          attack: 0,
+          serve: 0,
+          block: 0,
+          forcedError: 0,
+          unforced: 0,
+          unForcedError: 0,
+          errorCounterAttack: 0,
+          errorAttack: 0,
+          errorServe: 0,
+        },
+      },
+      team2: {
+        name: matchData.team2.name,
+        sets: 0,
+        points: [],
+        errors: {
+          unForcedError: 0,
+          errorCounterAttack: 0,
+          errorAttack: 0,
+          errorServe: 0,
+          totalErrors: 0,
+        },
+        pointsByType: {
+          attack: 0,
+          serve: 0,
+          block: 0,
+          forcedError: 0,
+          unforced: 0,
+          unForcedError: 0,
+          errorCounterAttack: 0,
+          errorAttack: 0,
+          errorServe: 0,
+        },
+      },
+      currentSet: 1,
+      sets: [{ team1Points: 0, team2Points: 0, pointsLog: [] }],
+      matchFinished: false,
+    };
+    actualizarDatos(datosInicialesDePartido);
+    setOpen(false)
   };
   let actualizarDatos = (nuevosDatos: MatchData) => {
     setMatchData(nuevosDatos);
@@ -457,11 +522,42 @@ const Page = () => {
           >
             Terminar Partido
           </Button>
-          <Button variant="destructive" className="bg-red-600 hover:bg-red-700">
+          <Button
+            onClick={() => {
+              setOpen(!open);
+            }}
+            variant="destructive"
+            className="bg-red-600 hover:bg-red-700"
+          >
             Reiniciar Partido
           </Button>
         </div>
       </div>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-red-500 mb-4">
+              USTED ESTA POR REINICIAR EL PARTIDO
+            </DialogTitle>
+            <DialogDescription>
+              ¿Esta seguro que desea REINICIAR el partido?
+            </DialogDescription>
+          </DialogHeader>
+          <div className=" flex justify-between">
+            <Button
+              onClick={() => {
+                setOpen(false);
+              }}
+              variant="outline"
+            >
+              Cancelar
+            </Button>
+            <Button onClick={() => {reiniciarPartido()}} variant="destructive">
+              Reiniciar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
