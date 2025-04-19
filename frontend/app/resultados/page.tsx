@@ -228,9 +228,13 @@ const Page = () => {
               </CardHeader>
               <CardContent>
                 <h1 className="text-[25px] font-semibold">
-                  Totales Ganados: {matchData.team1.points.length} puntos
+                  Totales Ganados ✅: {matchData.team1.points.length} puntos
                 </h1>
                 <GraficoPuntos teamData={matchData.team1} />
+                <h1 className="text-[25px] font-semibold mt-10 mb-10">
+                  Total de Errores ❌: {matchData.team1.errors.totalErrors} puntos 
+                </h1>
+                <GraficoErrores teamData={matchData.team1} />
 
                 {/* pointLOg[]<= con length le estoy pidiendo a JS cuantos elementos tiene ese arreglo */}
               </CardContent>
@@ -246,9 +250,13 @@ const Page = () => {
               </CardHeader>
               <CardContent>
                 <h1 className="text-[25px] font-semibold">
-                  Totales Ganados: {matchData.team2.points.length} puntos
+                  Totales Ganados ✅: {matchData.team2.points.length} puntos
                 </h1>
                 <GraficoPuntos teamData={matchData.team2} />
+                <h1 className="text-[25px] font-semibold mt-10 mb-10">
+                  Total de Errores ❌: {matchData.team2.errors.totalErrors} puntos 
+                </h1>
+                <GraficoErrores teamData={matchData.team2} />
 
                 {/* pointLOg[]<= con length le estoy pidiendo a JS cuantos elementos tiene ese arreglo */}
               </CardContent>
@@ -284,6 +292,45 @@ const GraficoPuntos = ({ teamData }: { teamData: TeamData }) => {
   return (
     <div>
       <ChartContainer config={chartConfig}>
+        <BarChart accessibilityLayer data={chartData}>
+          <CartesianGrid vertical={false} />
+          <XAxis
+            dataKey="type"
+            tickLine={false}
+            tickMargin={10}
+            axisLine={false}
+            // tickFormatter={(value) => value.slice(0, 6)}
+          />
+          <ChartTooltip
+            cursor={false}
+            content={<ChartTooltipContent indicator="dashed" />}
+          />
+          <Bar dataKey="pointType" fill="var(--color-pointType)" radius={4} />
+        </BarChart>
+      </ChartContainer>
+    </div>
+  );
+};
+
+const chartConfig2 = {
+  pointType: {
+    label: "Tipo de Error",
+    color: "#ffe66d",
+  },
+} satisfies ChartConfig;
+
+const GraficoErrores = ({ teamData }: { teamData: TeamData }) => {
+  console.log(teamData);
+  const chartData = [
+    { type: "Error NF", pointType: teamData.errors.unForcedError },
+
+    { type: "Error CA", pointType: teamData.errors.errorCounterAttack },
+    { type: "Error Ataque", pointType: teamData.errors.errorAttack },
+    { type: "Error Saque", pointType: teamData.errors.errorServe },
+  ];
+  return (
+    <div>
+      <ChartContainer config={chartConfig2}>
         <BarChart accessibilityLayer data={chartData}>
           <CartesianGrid vertical={false} />
           <XAxis
