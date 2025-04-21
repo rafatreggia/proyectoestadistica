@@ -20,6 +20,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 import { Label } from "@/components/ui/label";
 import { VolleyballRadio } from "@/components/volleyballRadio";
 
@@ -291,7 +299,7 @@ const Page = () => {
       matchFinished: false,
     };
     actualizarDatos(datosInicialesDePartido);
-    setOpen(false)
+    setOpen(false);
   };
   let actualizarDatos = (nuevosDatos: MatchData) => {
     setMatchData(nuevosDatos);
@@ -318,6 +326,106 @@ const Page = () => {
         return "error de contra ataque";
       default:
         return "Tipo de Punto no Definido";
+    }
+  };
+
+  const restarPunto = () => {
+    if (matchData.sets[0].pointsLog.length === 0) {
+      return;
+    }
+    //preguntar si es el primer punto del set
+    if (currentSet.pointsLog.length === 0) {
+      //estamos ante el premier punto del set y tenemos que volver al set anterior
+      let newMatchData = { ...matchData };
+      newMatchData.sets.pop();
+      let totalDeSet = newMatchData.sets.length;
+      let currentSetData = newMatchData.sets[totalDeSet - 1];
+      let largoDePointLog = currentSetData.pointsLog.length;
+      let ultimoPunto = currentSetData.pointsLog[largoDePointLog - 1];
+      currentSetData.pointsLog.pop();
+      newMatchData.currentSet -= 1;
+
+      //restar uno al equipo que se le sumo
+      let nombreEquipo1 = matchData.team1.name;
+      let nombreEquipo2 = matchData.team2.name;
+      let numeroEquipoGanador = nombreEquipo1 === ultimoPunto.team ? 1 : 2;
+      if (numeroEquipoGanador === 1) {
+        currentSetData.team1Points -= 1;
+        newMatchData.team1.sets -= 1;
+      } else {
+        currentSetData.team2Points -= 1;
+        newMatchData.team2.sets -= 1;
+      }
+      // al equipo que sumo hay que restarle uno al tipo de punto q gano y quitar un elemnto de sus puntos
+      if (numeroEquipoGanador === 1) {
+        newMatchData.team1.points.pop();
+        newMatchData.team1.pointsByType[ultimoPunto.type] -= 1;
+      } else {
+        newMatchData.team2.points.pop();
+        newMatchData.team2.pointsByType[ultimoPunto.type] -= 1;
+      }
+      //el tipo de punto fue error al equipo congtrario le tenemos q restar uno donde se guardaban los errores
+      if (
+        ultimoPunto.type === "errorServe" ||
+        ultimoPunto.type === "errorAttack" ||
+        ultimoPunto.type === "errorCounterAttack" ||
+        ultimoPunto.type === "unForcedError"
+      ) {
+        if (numeroEquipoGanador === 1) {
+          newMatchData.team2.errors[ultimoPunto.type] -= 1;
+          newMatchData.team2.errors.totalErrors -= 1;
+        } else {
+          newMatchData.team1.errors[ultimoPunto.type] -= 1;
+          newMatchData.team1.errors.totalErrors -= 1;
+        }
+      }
+      newMatchData.sets[newMatchData.currentSet - 1] = currentSetData;
+      actualizarDatos(newMatchData);
+    } else {
+      let largoDePointLog = currentSet.pointsLog.length;
+      let ultimoPunto = currentSet.pointsLog[largoDePointLog - 1];
+      //copia de partido y una copia del ultimo set
+      let newMatchData = { ...matchData };
+      let currentSetData = { ...currentSet };
+
+      // al ultimo set q le vamos a borrar un punto le tenemos que quitar
+      currentSetData.pointsLog.pop();
+      console.log(currentSetData.pointsLog);
+
+      //restar uno al equipo que se le sumo
+      let nombreEquipo1 = matchData.team1.name;
+      let nombreEquipo2 = matchData.team2.name;
+      let numeroEquipoGanador = nombreEquipo1 === ultimoPunto.team ? 1 : 2;
+      if (numeroEquipoGanador === 1) {
+        currentSetData.team1Points -= 1;
+      } else {
+        currentSetData.team2Points -= 1;
+      }
+      // al equipo que sumo hay que restarle uno al tipo de punto q gano y quitar un elemnto de sus puntos
+      if (numeroEquipoGanador === 1) {
+        newMatchData.team1.points.pop();
+        newMatchData.team1.pointsByType[ultimoPunto.type] -= 1;
+      } else {
+        newMatchData.team2.points.pop();
+        newMatchData.team2.pointsByType[ultimoPunto.type] -= 1;
+      }
+      //el tipo de punto fue error al equipo congtrario le tenemos q restar uno donde se guardaban los errores
+      if (
+        ultimoPunto.type === "errorServe" ||
+        ultimoPunto.type === "errorAttack" ||
+        ultimoPunto.type === "errorCounterAttack" ||
+        ultimoPunto.type === "unForcedError"
+      ) {
+        if (numeroEquipoGanador === 1) {
+          newMatchData.team2.errors[ultimoPunto.type] -= 1;
+          newMatchData.team2.errors.totalErrors -= 1;
+        } else {
+          newMatchData.team1.errors[ultimoPunto.type] -= 1;
+          newMatchData.team1.errors.totalErrors -= 1;
+        }
+      }
+      newMatchData.sets[newMatchData.currentSet - 1] = currentSetData;
+      actualizarDatos(newMatchData);
     }
   };
 
@@ -442,6 +550,16 @@ const Page = () => {
                   </div>
                 </RadioGroup>
               </div>
+              <div className="flex items-center justify-center mt-5">
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    restarPunto();
+                  }}
+                >
+                  Deshacer Punto
+                </Button>
+              </div>
             </CardContent>
             <CardFooter className="bg-blue-50 pt-4">
               <div className="w-full flex flex-wrap justify-around gap-4 ">
@@ -477,8 +595,8 @@ const Page = () => {
           </CardHeader>
           <CardContent className="bg-white p-4">
             {currentSet?.pointsLog?.length > 0 ? (
-              <div className="text-blue-700 text-center space-y-5 w-full">
-                {currentSet.pointsLog.map((pointLog, index) => {
+              <div className="text-blue-700 text-center space-y-5 w-full max-h-[300px] overflow-y-scroll">
+                {currentSet.pointsLog.slice().reverse().map((pointLog, index) => {
                   return (
                     <div
                       key={index}
@@ -532,6 +650,112 @@ const Page = () => {
             Reiniciar Partido
           </Button>
         </div>
+        <Tabs defaultValue="resumen" className="w-full mt-10">
+          <TabsList className="w-full grid lg:grid-cols-3 grid-cols-1 mb-[10px] pb-[90px] lg:mb-0 lg:pb-0">
+            <TabsTrigger value="resumen">Resumen</TabsTrigger>
+            <TabsTrigger value="team1" className="capitalize">
+              Estadisticas: {matchData.team1.name}
+            </TabsTrigger>
+            <TabsTrigger value="team2" className="capitalize">
+              Estadisticas: {matchData.team2.name}
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="resumen">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-[25px] text-blue-700">
+                  Resumen Por Sets
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-7">
+                  {matchData.sets.map((set, index) => {
+                    return (
+                      <div
+                        key={index}
+                        className="space-y-3 border-b-2 pb-2 border-blue-500"
+                      >
+                        <h1 className="text-[15px]">Set {index + 1}</h1>
+                        <div className="flex items-center justify-between capitalize text-[20px]">
+                          <div>
+                            <h2>{matchData.team1.name}</h2>
+                            <h3 className=" flex gap-2 font-semibold text-[30px] py-2">
+                              {set.team1Points}
+                              {set.team1Points > set.team2Points && (
+                                <img
+                                  src="/images/pelota.webp"
+                                  className="w-[45px]"
+                                ></img>
+                              )}
+                            </h3>
+                          </div>
+                          <div className="flex flex-col justify-end items-end">
+                            <h2>{matchData.team2.name}</h2>
+                            <h3 className=" flex flex-row-reverse gap-2 font-semibold text-[30px] py-2">
+                              {set.team2Points}
+                              {set.team2Points > set.team1Points && (
+                                <img
+                                  src="/images/pelota.webp"
+                                  className="w-[45px]"
+                                ></img>
+                              )}
+                            </h3>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="team1">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-[35px] text-blue-700">
+                  Resumen{" "}
+                  <span className="capitalize ">{matchData.team1.name}</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <h1 className="text-[25px] font-semibold">
+                  Totales Ganados ✅: {matchData.team1.points.length} puntos
+                </h1>
+                <GraficoPuntos teamData={matchData.team1} />
+                <h1 className="text-[25px] font-semibold mt-10 mb-10">
+                  Total de Errores ❌: {matchData.team1.errors.totalErrors}{" "}
+                  puntos
+                </h1>
+                <GraficoErrores teamData={matchData.team1} />
+
+                {/* pointLOg[]<= con length le estoy pidiendo a JS cuantos elementos tiene ese arreglo */}
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="team2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-[35px] text-blue-700">
+                  Resumen{" "}
+                  <span className="capitalize ">{matchData.team2.name}</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <h1 className="text-[25px] font-semibold">
+                  Totales Ganados ✅: {matchData.team2.points.length} puntos
+                </h1>
+                <GraficoPuntos teamData={matchData.team2} />
+                <h1 className="text-[25px] font-semibold mt-10 mb-10">
+                  Total de Errores ❌: {matchData.team2.errors.totalErrors}{" "}
+                  puntos
+                </h1>
+                <GraficoErrores teamData={matchData.team2} />
+
+                {/* pointLOg[]<= con length le estoy pidiendo a JS cuantos elementos tiene ese arreglo */}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
@@ -552,7 +776,12 @@ const Page = () => {
             >
               Cancelar
             </Button>
-            <Button onClick={() => {reiniciarPartido()}} variant="destructive">
+            <Button
+              onClick={() => {
+                reiniciarPartido();
+              }}
+              variant="destructive"
+            >
               Reiniciar
             </Button>
           </div>
@@ -563,3 +792,84 @@ const Page = () => {
 };
 
 export default Page;
+
+const chartConfig = {
+  pointType: {
+    label: "Tipo de Punto",
+    color: "#0067b1",
+  },
+} satisfies ChartConfig;
+
+const GraficoPuntos = ({ teamData }: { teamData: TeamData }) => {
+  console.log(teamData);
+  const chartData = [
+    { type: "Saque", pointType: teamData.pointsByType.serve },
+    { type: "Ataque", pointType: teamData.pointsByType.attack },
+    { type: "Bloqueo", pointType: teamData.pointsByType.block },
+    { type: "Error NF", pointType: teamData.pointsByType.unForcedError },
+    { type: "Contra Ataque", pointType: teamData.pointsByType.counterAttack },
+    { type: "Error CA", pointType: teamData.pointsByType.errorCounterAttack },
+    { type: "Error Ataque", pointType: teamData.pointsByType.errorAttack },
+    { type: "Error Saque", pointType: teamData.pointsByType.errorServe },
+  ];
+  return (
+    <div>
+      <ChartContainer config={chartConfig}>
+        <BarChart accessibilityLayer data={chartData}>
+          <CartesianGrid vertical={false} />
+          <XAxis
+            dataKey="type"
+            tickLine={false}
+            tickMargin={10}
+            axisLine={false}
+            // tickFormatter={(value) => value.slice(0, 6)}
+          />
+          <ChartTooltip
+            cursor={false}
+            content={<ChartTooltipContent indicator="dashed" />}
+          />
+          <Bar dataKey="pointType" fill="var(--color-pointType)" radius={4} />
+        </BarChart>
+      </ChartContainer>
+    </div>
+  );
+};
+
+const chartConfig2 = {
+  pointType: {
+    label: "Tipo de Error",
+    color: "#ffe66d",
+  },
+} satisfies ChartConfig;
+
+const GraficoErrores = ({ teamData }: { teamData: TeamData }) => {
+  console.log(teamData);
+  const chartData = [
+    { type: "Error NF", pointType: teamData.errors.unForcedError },
+
+    { type: "Error CA", pointType: teamData.errors.errorCounterAttack },
+    { type: "Error Ataque", pointType: teamData.errors.errorAttack },
+    { type: "Error Saque", pointType: teamData.errors.errorServe },
+  ];
+  return (
+    <div>
+      <ChartContainer config={chartConfig2}>
+        <BarChart accessibilityLayer data={chartData}>
+          <CartesianGrid vertical={false} />
+          <XAxis
+            dataKey="type"
+            tickLine={false}
+            tickMargin={10}
+            axisLine={false}
+            // tickFormatter={(value) => value.slice(0, 6)}
+          />
+          <ChartTooltip
+            cursor={false}
+            content={<ChartTooltipContent indicator="dashed" />}
+          />
+          <Bar dataKey="pointType" fill="var(--color-pointType)" radius={4} />
+        </BarChart>
+      </ChartContainer>
+    </div>
+  );
+};
