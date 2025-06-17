@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { validateSessionAdmin } from "./app/actions/admin";
+import { validateSessionAdmin } from "./lib/auth";
 
 export async function middleware(req: NextRequest) {
   if (req.nextUrl.pathname.startsWith("/admin")) {
