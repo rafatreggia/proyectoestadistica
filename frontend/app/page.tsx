@@ -1,10 +1,15 @@
-"use client"
-import React from 'react'
+"use client";
+import Nav from "@/components/landing/Nav";
+import React from "react";
 
 const Page = () => {
   return (
-    <div>page</div>
-  )
-}
+    <div>
+      <div>
+        <Nav />
+      </div>
+    </div>
+  );
+};
 
-export default Page
+export default Page;

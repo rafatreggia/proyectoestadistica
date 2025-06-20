@@ -5,6 +5,8 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
+import Club from "@/models/Club";
+import { convertToPlainObject } from "@/lib/utils";
 
 // export const createAdmin = async (email: string, password: string) => {
 //   try {
@@ -106,3 +108,19 @@ export async function decrypt(input: any) {
     return null;
   }
 }
+
+export const getAllClubs = async () => {
+  try {
+    await connectMongoDb();
+    let decodedToken = await validateSessionAdmin();
+    if (!decodedToken) {
+      return { ok: false, message: "Acceso Denegado" };
+    }
+    let clubs = await Club.find();
+    clubs = convertToPlainObject(clubs);
+    return { ok: true, clubs };
+  } catch (error) {
+    console.log(error);
+    return { ok: false, message: "Fallo el Servidor" };
+  }
+};

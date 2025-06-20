@@ -2,11 +2,12 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { IAdmin } from "@/lib/types";
+
 import React, { useState } from "react";
 import { loginAdmin } from "../actions/admin";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { IAdmin } from "@/models/Admin";
 // import { createAdmin } from "../actions/admin";
 
 const Page = () => {
